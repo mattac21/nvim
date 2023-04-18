@@ -43,7 +43,20 @@ local on_attach = function(client, bufnr)
   vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, bufopts)
   vim.keymap.set('n', '<space>ca', vim.lsp.buf.code_action, bufopts)
   vim.keymap.set('n', '<space>f', function() vim.lsp.buf.format { async = true } end, bufopts)
-  vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
+
+  local textedit = vim.api.nvim_create_augroup('textedit', { clear = true })
+  vim.api.nvim_create_autocmd({"BufWritePre"}, {
+      group = textedit,
+      callback = function()
+          local clients = vim.lsp.get_active_clients()
+          for _, c in ipairs(clients) do
+              if c.server_capabilities.documentFormattingProvider then
+                  vim.lsp.buf.format()
+              end
+          end
+      end,
+  })
+
 
   if client.name == 'gopls' and vim.fn.has('nvim-0.8.3') == 1 and not client.server_capabilities.semanticTokensProvider then
     local semantic = client.config.capabilities.textDocument.semanticTokens
