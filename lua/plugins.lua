@@ -47,6 +47,13 @@ return require('packer').startup(function(use)
   -- a better quick fix list
   use 'kevinhwang91/nvim-bqf'
 
+  -- fuzzy finder (used by bqf)
+  use {
+    'junegunn/fzf', run = function()
+      vim.fn['fzf#install']()
+    end
+  }
+
   -- running tests
   use 'vim-test/vim-test'
 
@@ -63,5 +70,11 @@ return require('packer').startup(function(use)
 
   -- completion for neovim lua apis
   use "folke/neodev.nvim"
+
+  -- scrollbar icons
+  use 'petertriho/nvim-scrollbar'
+
+  -- highlight word under cursor
+  use 'yamatsum/nvim-cursorline'
 
 end)

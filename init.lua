@@ -10,9 +10,11 @@ require('blankline')
 require('dap-virt-text')
 require('go-dap')
 require('nvim-dap')
+require('scroll-bar')
+require('cursor-line')
 
-vim.cmd('source /Users/mattacciai/.config/nvim/vs/scroll.vim')
-vim.cmd('source /Users/mattacciai/.config/nvim/vs/tests.vim')
+vim.cmd('source ~/.config/nvim/vs/scroll.vim')
+vim.cmd('source ~/.config/nvim/vs/tests.vim')
 
 vim.cmd.colorscheme "moonfly"
 
