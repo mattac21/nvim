@@ -2,6 +2,7 @@ local lsp = require('lspconfig')
 local cmp = require('cmp_nvim_lsp')
 local builtin = require('telescope.builtin')
 
+
 -- Mappings.
 -- See `:help vim.diagnostic.*` for documentation on any of the below functions
 local opts = { noremap=true, silent=true }
@@ -20,12 +21,12 @@ local on_attach = function(client, bufnr)
   -- See `:help vim.lsp.*` for documentation on any of the below functions
   local bufopts = { noremap=true, silent=true, buffer=bufnr }
 
-  local with_zz = function(f)
-    return function()
-      f()
-      vim.cmd('normal! zz')
+    local with_zz = function(f) 
+        return function()
+            f()
+            vim.cmd('normal! zz')
+        end
     end
-  end
 
   vim.keymap.set('n', 'gr', with_zz(builtin.lsp_references), bufopts)
   vim.keymap.set('n', 'gd', with_zz(builtin.lsp_definitions), bufopts)
@@ -44,6 +45,19 @@ local on_attach = function(client, bufnr)
   vim.keymap.set('n', '<space>ca', vim.lsp.buf.code_action, bufopts)
   vim.keymap.set('n', '<space>f', function() vim.lsp.buf.format { async = true } end, bufopts)
 
+    local gopls_highlight_semantic_tokens = function(client)
+        if client.name == 'gopls' and vim.fn.has('nvim-0.8.3') == 1 and not client.server_capabilities.semanticTokensProvider then
+            local semantic = client.config.capabilities.textDocument.semanticTokens
+            client.server_capabilities.semanticTokensProvider = {
+                full = true,
+                legend = { tokenModifiers = semantic.tokenModifiers, tokenTypes = semantic.tokenTypes },
+                range = true,
+            }
+        end
+    end
+
+  gopls_highlight_semantic_tokens(client)
+
   local textedit = vim.api.nvim_create_augroup('textedit', { clear = true })
   vim.api.nvim_create_autocmd({"BufWritePre"}, {
       group = textedit,
@@ -56,17 +70,15 @@ local on_attach = function(client, bufnr)
           end
       end,
   })
-
-
-  if client.name == 'gopls' and vim.fn.has('nvim-0.8.3') == 1 and not client.server_capabilities.semanticTokensProvider then
-    local semantic = client.config.capabilities.textDocument.semanticTokens
-    client.server_capabilities.semanticTokensProvider = {
-      full = true,
-      legend = { tokenModifiers = semantic.tokenModifiers, tokenTypes = semantic.tokenTypes },
-      range = true,
-    }
-  end
 end
+
+lsp.elixirls.setup{
+  cmd = { "/Users/mattacciai/bin/elixir/language_server.sh" },
+  capabilities = capabilities,
+  flags = {
+    debounce_text_changes = 150,
+  }
+}
 
 lsp.gopls.setup{
 	on_attach = on_attach,
@@ -114,3 +126,21 @@ lsp.gopls.setup{
         },
     },
 }
+
+lsp.clangd.setup({
+    filetypes = { "c", "cpp", "cc", "mpp", "ixx", "objc", "objcpp", "cuda" },
+    cmd = {
+      "/usr/bin/clangd",
+      "--query-driver=/**/*",
+      "--clang-tidy",
+      "--header-insertion=never",
+      "--offset-encoding=utf-16",
+    },
+    capabilities = cmp.default_capabilities(),
+    on_attach = function(client, bufnr)
+      require("clangd_extensions.inlay_hints").setup_autocmd()
+      require("clangd_extensions.inlay_hints").set_inlay_hints()
+    end,
+})
+
+lsp.cmake.setup({ capabilities = cmp.default_capabilities() })

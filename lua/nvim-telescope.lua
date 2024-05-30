@@ -5,3 +5,6 @@ vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
 vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
 vim.keymap.set('n', '<leader>fd', builtin.diagnostics, {})
 pcall(require('telescope').load_extension, 'fzf')
+
+pcall(require('telescope').load_extension, 'projects')
+vim.keymap.set('n', '<leader>fD', require('telescope').extensions.projects.projects, {})

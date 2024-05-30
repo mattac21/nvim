@@ -77,4 +77,16 @@ return require('packer').startup(function(use)
   -- highlight word under cursor
   use 'yamatsum/nvim-cursorline'
 
+  -- auto insert pairs
+  use 'windwp/nvim-autopairs'
+
+  -- jump between repos
+  use "ahmedkhalf/project.nvim"
+
+  -- commenting
+  use { 'numToStr/Comment.nvim' }
+
+  use "p00f/clangd_extensions.nvim"
+
+  use "Civitasv/cmake-tools.nvim"
 end)
